@@ -1,9 +1,9 @@
 
-Local resWidth#=Float 640 ; Resolución horizontal
-Local resHeight#=Float 480 ; Resolución vertical
+Local resWidth#=Float 640 ; ResoluciÃ³n horizontal
+Local resHeight#=Float 480 ; ResoluciÃ³n vertical
 Local resCd=32 ; Profundidad de color
 Local resWindow=0 ; Modo ventana: 0, pantalla completa 1
-Local running=1 ; ¿Está el programa corriendo?
+Local running=1 ; Â¿EstÃ¡ el programa corriendo?
 
 
 
@@ -110,6 +110,14 @@ Function logicaJuego(cubo, luz, texturaCubo, camara)
 		rotYCubo# = rotYCubo# + velocidadCubo#
 	End If
 
+	If KeyDown(17)
+		rotXCubo# = rotXCubo# + velocidadCubo#
+	End If
+
+	If KeyDown(31)
+		rotXCubo# = rotXCubo# - velocidadCubo#
+	End If
+
 
 	If rotXCubo# > 360
 		rotXCubo# = 0
@@ -152,17 +160,17 @@ End Function
 Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3)
 
 	Color color1,color2,color3
-	Text resWidth#*4/100+ distancia,resHeight#*4/100 + distancia,"Resolución horizontal:"+resWidth#,0,0
-	Text resWidth#*4/100+ distancia,resHeight#*8/100+ distancia,"Resolución vertical:"+resHeight#,0,0
-	Text resWidth#*4/100+ distancia,resHeight#*12/100+ distancia,"Posición cubo:"+ posXCubo# + "," + posYCubo# + "," + posZCubo#
-	Text resWidth#*4/100+ distancia,resHeight#*16/100+ distancia,"Rotación cubo:"+ rotXCubo# + "," + rotYCubo# + "," + rotZCubo#
+	Text resWidth#*4/100+ distancia,resHeight#*4/100 + distancia,"ResoluciÃ³n horizontal:"+resWidth#,0,0
+	Text resWidth#*4/100+ distancia,resHeight#*8/100+ distancia,"ResoluciÃ³n vertical:"+resHeight#,0,0
+	Text resWidth#*4/100+ distancia,resHeight#*12/100+ distancia,"PosiciÃ³n cubo:"+ posXCubo# + "," + posYCubo# + "," + posZCubo#
+	Text resWidth#*4/100+ distancia,resHeight#*16/100+ distancia,"RotaciÃ³n cubo:"+ rotXCubo# + "," + rotYCubo# + "," + rotZCubo#
 	Text resWidth#*4/100+ distancia,resHeight#*20/100+ distancia,"Velocidad cubo:"+ velocidadCubo#
-	Text resWidth#*4/100+ distancia,resHeight#*24/100+ distancia,"Coordenadas del ratón:"+ MouseX() + "," + MouseY() + "," + MouseZ() 
+	Text resWidth#*4/100+ distancia,resHeight#*24/100+ distancia,"Coordenadas del ratÃ³n:"+ MouseX() + "," + MouseY() + "," + MouseZ() 
 
 
-	Text resWidth#*4/100+ distancia,resHeight#*84/100+ distancia,"Usa las flechas de dirección para mover el cubo.",0,0
+	Text resWidth#*4/100+ distancia,resHeight#*84/100+ distancia,"Usa las flechas de direcciÃ³n para mover el cubo.",0,0
 	Text resWidth#*4/100+ distancia,resHeight#*88/100+ distancia,"Usa las teclas Q y E para subir y bajar el cubo.",0,0
-	Text resWidth#*4/100+ distancia,resHeight#*92/100+ distancia,"Usa las teclas + y - del teclado numérico para cambiar la velocidad.",0,0
+	Text resWidth#*4/100+ distancia,resHeight#*92/100+ distancia,"Usa las teclas + y - del teclado numÃ©rico para cambiar la velocidad.",0,0
 End Function
 
 
