@@ -11,16 +11,18 @@ Local running=1 ; ¿Está el programa corriendo?
 
 
 AppTitle "Trabajo en grupo - Eme, Juan y JD"
-Graphics3D resWidth#, resHeight#, resCd, resWindow
-SeedRnd(MilliSecs()) 
-SetBuffer BackBuffer()
+Graphics3D resWidth#, resHeight#, resCd, resWindow ; Esta línea establece la pantalla del programa, los parámetros son la resolución, la profundidad de color y si es pantalla completa o una ventana
+SeedRnd(MilliSecs()) ; Esto sirve para poner una nueva semilla para el generador de números aleatorios, que aún no he usado
+SetBuffer BackBuffer() ; Esto sirve para decirle al programa que todas las operaciones de dibujado las haga en memoria, más tarde en el bucle se intercambiarán la memoria con la pantalla con el flip()
+; Basicamente esto hay que hacerlo para que no haya cortes en la pantalla, es decir, primero dibujamos todo en memoria, y cuando ya tengamos el fotograma completo lo mandamos a la pantalla
 
-Local cubo=CreateCube()
+Local cubo=CreateCube() 
 Local camara=CreateCamera()
 Local habitacion=CreateCube()
 ScaleEntity habitacion,20.0,10.0,20.0
 PositionEntity habitacion,0,0,5
-FlipMesh habitacion
+FlipMesh habitacion ; Con esto volteamos los normales de un modelo, cosa que significa que las caras de dentro serán consideradas las caras visibles
+; Basicamente, no veremos las caras de fuera pero sí las de dentro
 CameraViewport camara,0,0,resWidth#,resHeight#
 luz=CreateLight(1)
 
@@ -35,7 +37,7 @@ Global velocidadCubo# = 0.5
 Global camX# = 0
 Global camY# = 0
 Global camZ# = 0
-
+; Aquí he usado variables globlales y no locales para que sea más fácil trabajar con las distintas entidades que he creado
 
 
 
@@ -57,7 +59,7 @@ Local texturaSuelo = LoadTexture("pared.png")
 ;TextureBlend texturaCubo,0
 
 
-Function logicaJuego(cubo, luz, texturaCubo, camara)
+Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aquí funcionará toda la lógica del juego, llamamos esta función en el bucle y se repite constantemente
 	
 	;ClearTextureFilters() 
 
@@ -65,12 +67,13 @@ Function logicaJuego(cubo, luz, texturaCubo, camara)
 	
 
 
-	If rotando = 1
+	If rotando = 1 ; Si ponemos la variable de rotando a 1, se activará el modo en el que el cubo no para de dar vueltas
 		rotXCubo# = rotXCubo# + velocidadCubo#
 		rotYCubo# = rotYCubo# + velocidadCubo#
 		rotZCubo# = rotZCubo# + velocidadCubo#
 	End If
-
+	
+	; CONTROLES DEL CUBO
 	If KeyDown(200)
 		posZCubo# = posZCubo# + velocidadCubo#
 	End If
@@ -123,7 +126,8 @@ Function logicaJuego(cubo, luz, texturaCubo, camara)
 		rotXCubo# = 0
 	End If
 	If rotYCubo# > 360
-		rotYCubo# = 0
+		rotYCubo# = 0 ; Esto no es más que un poco de estética para las variables de debug que se muestran en pantalla, si una variable de rotación
+		; pasa de 360, la ponemos a 0, que al final es lo mismo
 	End If
 	If rotZCubo# > 360
 		rotZCubo# = 0
@@ -178,21 +182,21 @@ End Function
 
 
 
-initDX7Hack()
+initDX7Hack() ; Estas son las dos funciones que llamamos para que se arregle lo del filtrado de texturas que no me gusta
 DisableTextureFilters()
 
 EntityTexture habitacion,texturaSuelo
 
-While running = 1
+While running = 1 ; Este es el bucle del juego, está corriendo constantemente
 
-	Cls
-	RenderWorld
-	logicaJuego(cubo, luz, texturaCubo, camara)
-	dibujatexto(resWidth#,resHeight#, 0, 0, 0, 0)
-	dibujatexto(resWidth#,resHeight#, -2, 255,255,255)
-	Flip
+	Cls ; Limpiamos la pantalla
+	RenderWorld ; Renderizamos la escena
+	logicaJuego(cubo, luz, texturaCubo, camara) ; Llamamos a la función de la lógica para que se ejecute
+	dibujatexto(resWidth#,resHeight#, 0, 0, 0, 0) ; Dibujamos la sombra del texto
+	dibujatexto(resWidth#,resHeight#, -2, 255,255,255) ; Dibujamos el texto
+	Flip ; Mandamos todo lo que se ha dibujado en memoria a la pantalla
 
-
+; Y el bucle se repite constantemente
 
 
 Wend
