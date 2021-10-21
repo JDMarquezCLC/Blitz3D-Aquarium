@@ -19,7 +19,10 @@ SetBuffer BackBuffer() ; Esto sirve para decirle al programa que todas las opera
 Local cubo=CreateCube() 
 Local camara=CreateCamera()
 Local habitacion=CreateCube()
+Local bala=CreateCube()
 ScaleEntity habitacion,20.0,10.0,20.0
+ScaleEntity bala,0.25,0.25,0.25
+PositionEntity bala,0,0,5
 PositionEntity habitacion,0,0,5
 FlipMesh habitacion ; Con esto volteamos los normales de un modelo, cosa que significa que las caras de dentro serán consideradas las caras visibles
 ; Basicamente, no veremos las caras de fuera pero sí las de dentro
@@ -66,11 +69,16 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aquí funcionará toda la
 	;TextureFilter "",1
 	
 
+	Local random#
+
 
 	If rotando = 1 ; Si ponemos la variable de rotando a 1, se activará el modo en el que el cubo no para de dar vueltas
-		rotXCubo# = rotXCubo# + velocidadCubo#
-		rotYCubo# = rotYCubo# + velocidadCubo#
-		rotZCubo# = rotZCubo# + velocidadCubo#
+		SeedRnd (MilliSecs()) 
+		random# = (Rand(5,10) / 100)
+
+		rotXCubo# = rotXCubo# + random#
+		rotYCubo# = rotYCubo# + random#
+		rotZCubo# = rotZCubo# + random#
 	End If
 	
 	; CONTROLES DEL CUBO
@@ -133,6 +141,8 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aquí funcionará toda la
 		rotZCubo# = 0
 	End If
 
+
+
 	PositionEntity cubo,posXCubo#, posYCubo#, posZCubo#
 	;PositionEntity luz,posXCubo# + 5, posYCubo# + 5, posZCubo# + 5
 	RotateEntity cubo,rotXCubo#, rotYCubo#, rotZCubo#
@@ -140,9 +150,18 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aquí funcionará toda la
 	PositionEntity camara, posXCubo# + 0.25, posYCubo# + 1, posZCubo# - 5
 	RotateEntity camara, camX#, camY#, camZ#
 
+
 	
 
 End Function
+
+
+
+
+
+
+
+
 
 ; FUNCIONES DEL ARREGLO DE FILTRADO DE TEXTURAS
 
