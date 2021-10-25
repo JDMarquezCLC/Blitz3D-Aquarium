@@ -1,6 +1,6 @@
 
-Local resWidth#=Float 640 ; Resolución horizontal
-Local resHeight#=Float 480 ; Resolución vertical
+Local resWidth#=Float 1280 ; Resolución horizontal
+Local resHeight#=Float 960 ; Resolución vertical
 Local resCd=32 ; Profundidad de color
 Local resWindow=0 ; Modo ventana: 0, pantalla completa 1
 Local running=1 ; ¿Está el programa corriendo?
@@ -21,6 +21,7 @@ Local camara=CreateCamera()
 Local habitacion=CreateCube()
 ;Local bala=CreateCube()
 ScaleEntity habitacion,20.0,10.0,20.0
+ScaleEntity cubo,0.75,0.75,0.75
 ;ScaleEntity bala,0.25,0.25,0.25 ; Objeto de proyectil
 ;PositionEntity bala,9999,9999,9999
 PositionEntity habitacion,0,0,5
@@ -112,16 +113,6 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aquí funcionará toda la
 	
 
 	Local random#
-
-
-	If rotando = 1 ; Si ponemos la variable de rotando a 1, se activará el modo en el que el cubo no para de dar vueltas
-		SeedRnd (MilliSecs()) 
-		random# = (Rand(5,10) / 100)
-
-		rotXCubo# = rotXCubo# + random#
-		rotYCubo# = rotYCubo# + random#
-		rotZCubo# = rotZCubo# + random#
-	End If
 	
 	; CONTROLES DEL CUBO
 	If KeyDown(200)
@@ -236,7 +227,7 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aquí funcionará toda la
 	RotateEntity cubo,rotXCubo#, rotYCubo#, rotZCubo#
 	EntityTexture cubo,texturaCubo
 	If camMode = 0
-		PositionEntity camara, posXCubo# + 0.25, posYCubo# + 1, posZCubo# - 5
+		PositionEntity camara, posXCubo# + 0.25, posYCubo# + 2, posZCubo# - 5
 		RotateEntity camara, camX#, camY#, camZ#
 	End If
 
@@ -256,7 +247,7 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aquí funcionará toda la
 		If balasJugador(i,5) = 1
 			balasJugador(i,3) = balasJugador(i,3) + balasJugador(i,4)
 		End If
-		If balasJugador(i,3) > 100
+		If balasJugador(i,3) > 100 ; Si la posición Z de la bala es mayor de 100, no se puede mover
 			balasJugador(i,5) = 0
 			
 			For z=1 To 2
