@@ -1,93 +1,4 @@
 
-Local resWidth#=Float 1280 ; Resoluci√≥n horizontal
-Local resHeight#=Float 960 ; Resoluci√≥n vertical
-Local resCd=32 ; Profundidad de color
-Local resWindow=0 ; Modo ventana: 0, pantalla completa 1
-Local running=1 ; ¬øEst√° el programa corriendo?
-
-
-
-
-
-
-AppTitle "Trabajo en grupo - Eme, Juan y JD"
-Graphics3D resWidth#, resHeight#, resCd, resWindow ; Esta l√≠nea establece la pantalla del programa, los par√°metros son la resoluci√≥n, la profundidad de color y si es pantalla completa o una ventana
-SeedRnd(MilliSecs()) ; Esto sirve para poner una nueva semilla para el generador de n√∫meros aleatorios, que a√∫n no he usado
-SetBuffer BackBuffer() ; Esto sirve para decirle al programa que todas las operaciones de dibujado las haga en memoria, m√°s tarde en el bucle se intercambiar√°n la memoria con la pantalla con el flip()
-; Basicamente esto hay que hacerlo para que no haya cortes en la pantalla, es decir, primero dibujamos todo en memoria, y cuando ya tengamos el fotograma completo lo mandamos a la pantalla
-
-Local cubo=CreateCube() 
-Local camara=CreateCamera()
-Local habitacion=CreateCube()
-;Local bala=CreateCube()
-ScaleEntity habitacion,20.0,10.0,20.0
-ScaleEntity cubo,0.75,0.75,0.75
-;ScaleEntity bala,0.25,0.25,0.25 ; Objeto de proyectil
-;PositionEntity bala,9999,9999,9999
-PositionEntity habitacion,0,0,5
-FlipMesh habitacion ; Con esto volteamos los normales de un modelo, cosa que significa que las caras de dentro ser√°n consideradas las caras visibles
-; Basicamente, no veremos las caras de fuera pero s√≠ las de dentro
-CameraViewport camara,0,0,resWidth#,resHeight#
-luz=CreateLight(1)
-
-
-;Type BALA ; Creaci√≥n del objeto bala
-;Field MODEL
-;Field X ;Posici√≥n
-;Field Y
-;Field Z
-;Field VEL ; Velocidad
-;Field SX ; Escala
-;Field SY
-;Field SZ
-;End Type
-
-
-; Creamos una bala inicial
-
-		
-
-
-
-Global posXCubo# = Float 0
-Global posYCubo# = Float 0
-Global posZCubo# = Float 5
-Global rotXCubo# = Float 0
-Global rotYCubo# = Float 0
-Global rotZCubo# = Float 0
-Global rotando = 0
-Global velocidadCubo# = 0.5
-Global camX# = 0
-Global camY# = 0
-Global camZ# = 0
-;Global balaX# = 9999
-;Global balaY# = 9999
-;Global balaZ# = 9999
-Global disparado = 0 ; Con esta variable sabremos si el jugador ha disparado ya o no
-; Aqu√≠ he usado variables globlales y no locales para que sea m√°s f√°cil trabajar con las distintas entidades que he creado
-
-
-Global camMode = 0 ; Comprobamos cu√°l es el modo de c√°mara actual, con el 0 la c√°mara se posiciona detr√°s del jugador, con el 1 se pone a un lado para ver las balas
-
-
-Dim balasJugador (3,6) ; Array de las balas del jugador
-
-Global cantidadBalas = 0 ; ¬øCu√°ntas balas hemos disparado ya?
-
-Global delayBalas = 0 ; El tiempo de espera desde que podemos disparar una bala hasta disparar otra
-
-For i=1 To 3 
-	balasJugador(i,6)=CreateCube()
-	For z=1 To 2
-		balasJugador(i,z)=9999
-	Next
-	ScaleEntity balasJugador(i,6),0.25,0.25,0.25
-Next
-
-; Podremos almacenar hasta 3 balas, y cada una tendr√° 3 coordenadas de posici√≥n y una velocidad, y un √∫ltimo valor para saber si debe moverse o no, el √∫ltimo de verdad es para el modelo
-
-
-
 ; ARREGLO DEL FILTRADO DE TEXTURAS
 
 Const D3DTSS_MAGFILTER = 16
@@ -99,17 +10,99 @@ Const D3DTEXF_LINEAR = 2
 
 ; FIN DE LAS VARIABLES DEL ARREGLO DE FILTRADO DE TEXTURAS
 
-Local texturaCubo = LoadTexture("cubo.png")
+
+Local resWidth#=Float 640 ; ResoluciÛn horizontal
+Local resHeight#=Float 480 ; ResoluciÛn vertical
+Local resCd=32 ; Profundidad de color
+Local resWindow=0 ; Modo ventana: 0, pantalla completa 1
+
+AppTitle "Trabajo en grupo - Eme, Juan y JD"
+Graphics3D resWidth#, resHeight#, resCd, resWindow 
+SeedRnd(MilliSecs())
+SetBuffer BackBuffer() 
+
+Local running=1 ; øEst· el programa corriendo?
+Local cubo=LoadMesh("pescao.3ds") 
+Local camara=CreateCamera()
+Local habitacion=CreateCube()
+Local luz=CreateLight(1)
+Local texturaCubo = LoadTexture("pescao.png")
 Local texturaSuelo = LoadTexture("pared.png")
 
-;TextureBlend texturaCubo,0
+; CreaciÛn de variables globales, que pueden ser accedidas desde cualquier sitio
+
+; Posicionamiento y rotaciÛn del cubo
+Global posXCubo# = Float 0
+Global posYCubo# = Float 0
+Global posZCubo# = Float 5 
+Global rotXCubo# = Float 0
+Global rotYCubo# = Float 0
+Global rotZCubo# = Float 0
+Global rotando = 0
+Global velocidadCubo# = 0.5
+; Posicionamiento de la c·mara
+Global camX# = 0
+Global camY# = 0 
+Global camZ# = 0
+Global camMode = 0 
+Global cantidadBalas = 0
+Global delayBalas = 0
 
 
-Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aqu√≠ funcionar√° toda la l√≥gica del juego, llamamos esta funci√≥n en el bucle y se repite constantemente
-	
-	;ClearTextureFilters() 
 
-	;TextureFilter "",1
+
+
+
+
+
+
+
+; ManipulaciÛn de entidades inicial
+
+ScaleEntity habitacion,20.0,10.0,20.0
+ScaleEntity cubo,0.75,0.75,0.75
+PositionEntity habitacion,0,0,5
+FlipMesh habitacion 
+CameraViewport camara,0,0,resWidth#,resHeight# 	
+EntityTexture habitacion,texturaSuelo
+
+;CreaciÛn de las balas
+Dim balasJugador (3,6) ; Array de las balas del jugador
+For i=1 To 3 
+	balasJugador(i,6)=CreateCube() ;CreaciÛn de bala
+	For z=1 To 2
+		balasJugador(i,z)=9999 ; PosiciÛn inicial
+	Next
+	ScaleEntity balasJugador(i,6),0.25,0.25,0.25
+Next
+
+; Podremos almacenar hasta 3 balas, y cada una tendr· 3 coordenadas de posiciÛn y una velocidad, y un ˙ltimo valor para saber si debe moverse o no, el ˙ltimo de verdad es para el modelo
+
+
+Dim pescaos# (10,6) ; Array de las balas del jugador
+;posX,posY,posZ,velocidad,modelo, textura
+For i=1 To 10
+	pescaos(i,1) = Rnd(-32,-48)
+	pescaos(i,2) = Rnd(-0.5,8)
+	pescaos(i,3) = Rnd(-12,22)
+	pescaos(i,4) = Float Rnd(0.1,0.5)
+	pescaos(i,5) = LoadMesh("pescao.3ds") 
+	pescaos(i,6) = LoadTexture("pescao.png")
+	EntityTexture pescaos(i,5),pescaos(i,6)
+	RotateEntity pescaos(i,5),0,90,0
+Next
+
+
+
+
+
+
+
+
+
+
+Function logicaJuego(cubo, luz, texturaCubo, camara) 	; AquÌ funcionar· toda la lÛgica del juego, llamamos esta funciÛn en el bucle y se repite constantemente
+														;Le daremos como argumentos las entidades LOCALES del cubo, la luz y la c·mara, y la textura del cubo
 	
 
 	Local random#
@@ -163,7 +156,8 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aqu√≠ funcionar√° toda la
 	End If
 
 
-	If KeyDown(19) ; Si pulsas la R, manda al cubo de vuelta a las coordenadas 0,0,0 y reinicia la velocidad
+	If KeyDown(19) 	; Si pulsas la R, manda al cubo de vuelta 
+					;a las coordenadas 0,0,0 y reinicia la velocidad
 		posXCubo# = 0
 		posYCubo# = 0 
 		posZCubo# = 0
@@ -175,7 +169,8 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aqu√≠ funcionar√° toda la
 		rotXCubo# = 0
 	End If
 	If rotYCubo# > 360
-		rotYCubo# = 0 ; Esto no es m√°s que un poco de est√©tica para las variables de debug que se muestran en pantalla, si una variable de rotaci√≥n
+		rotYCubo# = 0 ; Esto no es m·s que un poco de estÈtica para las variables 
+		;de debug que se muestran en pantalla, si una variable de rotaciÛn
 		; pasa de 360, la ponemos a 0, que al final es lo mismo
 	End If
 	If rotZCubo# > 360
@@ -183,11 +178,13 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aqu√≠ funcionar√° toda la
 	End If
 
 
-	If KeyDown(57) And delayBalas = 0 And cantidadBalas < 3 ; Pulsamos el espacio
-
-
-
+	If KeyDown(57) And delayBalas = 0 And cantidadBalas < 3 
+		; Pulsamos el espacio, el cÛdigo se ejecutar· si han pasado 25 milisegundos
+		;desde la ˙ltima disparada y la cantidad de balas en movimiento es menor a 3
+	
+	
 		
+		;Actualizaremos el array de las balas
 		balasJugador(cantidadBalas+1,1) = posXCubo#
 		balasJugador(cantidadBalas+1,2) = posYCubo#
 		balasJugador(cantidadBalas+1,3) = posZCubo#
@@ -195,73 +192,73 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) ; Aqu√≠ funcionar√° toda la
 		balasJugador(cantidadBalas+1,5) = 1
 		delayBalas = 25
 
-
-
-
-
 	End If
 
-	;	balaJugador.BALA = New BALA
-	;	balaJugador\MODEL = CreateCube()
-	;	balaJugador\X = posXCubo# + 0.5
-	;	balaJugador\Y = posYCubo# + 0.5
-	;	balaJugador\Z = posZCubo# + 0.5
-	;	balaJugador\VEL = 2
-	;	balaJugador\SX = 0.25
-	;	balaJugador\SY = 0.25
-	;	balaJugador\SZ = 0.25
 
-
-	
-
-	;For balaJugador.BALA = Each BALA
-	;	balaJugador\Z = balaJugador\Z + balaJugador\VEL
-	;Next
-
-	If KeyDown(25)
+	If KeyDown(25) ; Al pulsar la P cambiamos el modo de c·mara al lateral
 		camMode = 1
 	End If
 
+
+	; Una vez se han terminado las comprobaciones de controles, actualizamos las variables de posicionamiento y rotaciÛn
+	; de las entidades
+
 	PositionEntity cubo,posXCubo#, posYCubo#, posZCubo#
-	;PositionEntity luz,posXCubo# + 5, posYCubo# + 5, posZCubo# + 5
 	RotateEntity cubo,rotXCubo#, rotYCubo#, rotZCubo#
 	EntityTexture cubo,texturaCubo
-	If camMode = 0
+	
+	If camMode = 0 ; Si el modo de c·mara es 0, vamos a poner la c·mara detr·s del cubo
 		PositionEntity camara, posXCubo# + 0.25, posYCubo# + 2, posZCubo# - 5
 		RotateEntity camara, camX#, camY#, camZ#
 	End If
 
-	If camMode = 1
+	If camMode = 1 ;Si es uno, la ponemos en el lateral
 		PositionEntity camara,16.5,0.0,11.0
 		RotateEntity camara,0.0,90.5,0.0
 	End If
 
 
-	;PositionEntity balaJugador\MODEL.BALA,balaJugador\X, balaJugador\Y, balaJugador\Z
-	If delayBalas > 0
+
+	If delayBalas > 0 	; La variable del delay de las balas se ir· reduciendo autom·ticamente de forma constante,
+						; por tanto tendremos que esperar 25 milisegundos para volver a disparar
 		delayBalas = delayBalas -1
 	End If
-
+	;ACtualizar balas
 	For i=1 To 3
 		PositionEntity balasJugador(i,6), balasJugador(i,1), balasJugador(i,2), balasJugador(i,3)
 		If balasJugador(i,5) = 1
 			balasJugador(i,3) = balasJugador(i,3) + balasJugador(i,4)
 		End If
-		If balasJugador(i,3) > 100 ; Si la posici√≥n Z de la bala es mayor de 100, no se puede mover
+		If balasJugador(i,3) > 100 ; Si la posiciÛn Z de la bala es mayor de 100, no se puede mover
 			balasJugador(i,5) = 0
 			
 			For z=1 To 2
 				balasJugador(i,z)=9999
 			Next
 			balasJugador(i,3) = 0
-			;cantidadBalas = cantidadBalas - 1
+			
 
 		End If
 	Next
 
-	;If balasJugador(1,3) + balasJugador(2,3) + balasJugador(3,3) = 0
-	;	cantidadBalas = 0
-	;End If
+
+	;Actualizar peces
+	For i=1 To 10
+		PositionEntity pescaos(i,5), pescaos(i,1), pescaos(i,2), pescaos(i,3)
+		pescaos(i,1) = pescaos(i,1) + pescaos(i,4)
+		If pescaos(i,1) > 32 ; Si la posiciÛn Z de la bala es mayor de 100, no se puede mover
+			pescaos(i,1) = Rnd(-32,-48)
+			pescaos(i,2) = Rnd(-0.5,8)
+			pescaos(i,3) = Rnd(-12,22)
+			pescaos(i,4) = Float Rnd(0.1,0.5)
+		End If
+	Next
+
+
+
+
+
+
 	cantidadBalas = balasJugador(1,5) + balasJugador(2,5) + balasJugador(3,5)
 	
 
@@ -295,28 +292,28 @@ End Function
 Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3)
 
 	Color color1,color2,color3
-	Text resWidth#*4/100+ distancia,resHeight#*4/100 + distancia,"Resoluci√≥n horizontal:"+resWidth#,0,0
-	Text resWidth#*4/100+ distancia,resHeight#*8/100+ distancia,"Resoluci√≥n vertical:"+resHeight#,0,0
-	Text resWidth#*4/100+ distancia,resHeight#*12/100+ distancia,"Posici√≥n cubo:"+ posXCubo# + "," + posYCubo# + "," + posZCubo#
-	Text resWidth#*4/100+ distancia,resHeight#*16/100+ distancia,"Rotaci√≥n cubo:"+ rotXCubo# + "," + rotYCubo# + "," + rotZCubo#
+	Text resWidth#*4/100+ distancia,resHeight#*4/100 + distancia,"ResoluciÛn horizontal:"+resWidth#,0,0
+	Text resWidth#*4/100+ distancia,resHeight#*8/100+ distancia,"ResoluciÛn vertical:"+resHeight#,0,0
+	Text resWidth#*4/100+ distancia,resHeight#*12/100+ distancia,"PosiciÛn cubo:"+ posXCubo# + "," + posYCubo# + "," + posZCubo#
+	Text resWidth#*4/100+ distancia,resHeight#*16/100+ distancia,"RotaciÛn cubo:"+ rotXCubo# + "," + rotYCubo# + "," + rotZCubo#
 	Text resWidth#*4/100+ distancia,resHeight#*20/100+ distancia,"Velocidad cubo:"+ velocidadCubo#
-	Text resWidth#*4/100+ distancia,resHeight#*24/100+ distancia,"Coordenadas del rat√≥n:"+ MouseX() + "," + MouseY() + "," + MouseZ() 
+	Text resWidth#*4/100+ distancia,resHeight#*24/100+ distancia,"Coordenadas del ratÛn:"+ MouseX() + "," + MouseY() + "," + MouseZ() 
 	Text resWidth#*4/100+ distancia,resHeight#*28/100+ distancia,"Cantidad de balas disparadas:"+ cantidadBalas 
 	Text resWidth#*4/100+ distancia,resHeight#*32/100+ distancia,"Delay balas:" + delayBalas
 	For i=1 To 3
 		Text resWidth#*4/100+ distancia + Len("Array balas:") + 32*i,resHeight#*36/100+ distancia, i
-		For z=1 To 6
+		For z=1 To 5
 			Text resWidth#*4/100+ distancia + Len("Array balas:") + 32*i,resHeight#*36/100+ distancia + 32*z, balasJugador(i,z)
 		Next
 	Next
-	Text resWidth#*50/100+ distancia,resHeight#*4/100+ distancia,"C√°mara lateral = Tecla P"
+	Text resWidth#*50/100+ distancia,resHeight#*4/100+ distancia,"C·mara lateral = Tecla P"
 	Text resWidth#*50/100+ distancia,resHeight#*8/100+ distancia,"WASD para rotar el cubo"
 	Text resWidth#*50/100+ distancia,resHeight#*12/100+ distancia,"Espacio para disparar"
 
 
-	Text resWidth#*4/100+ distancia,resHeight#*84/100+ distancia,"Usa las flechas de direcci√≥n para mover el cubo.",0,0
+	Text resWidth#*4/100+ distancia,resHeight#*84/100+ distancia,"Usa las flechas de direcciÛn para mover el cubo.",0,0
 	Text resWidth#*4/100+ distancia,resHeight#*88/100+ distancia,"Usa las teclas Q y E para subir y bajar el cubo.",0,0
-	Text resWidth#*4/100+ distancia,resHeight#*92/100+ distancia,"Usa las teclas + y - del teclado num√©rico para cambiar la velocidad.",0,0
+	Text resWidth#*4/100+ distancia,resHeight#*92/100+ distancia,"Usa las teclas + y - del teclado numÈrico para cambiar la velocidad.",0,0
 End Function
 
 
@@ -327,26 +324,15 @@ End Function
 initDX7Hack() ; Estas son las dos funciones que llamamos para que se arregle lo del filtrado de texturas que no me gusta
 DisableTextureFilters()
 
-EntityTexture habitacion,texturaSuelo
 
 
 
-		;balaJugador.BALA = New BALA
-		;balaJugador\MODEL = CreateCube()
-		;balaJugador\X = posXCubo# + 0.5
-		;balaJugador\Y = posYCubo# + 0.5
-		;balaJugador\Z = posZCubo# + 0.5
-		;balaJugador\VEL = 2
-		;balaJugador\SX = 0.25
-		;balaJugador\SY = 0.25
-		;balaJugador\SZ = 0.25
 
-
-While running = 1 ; Este es el bucle del juego, est√° corriendo constantemente
+While running = 1 ; Este es el bucle del juego, est· corriendo constantemente
 
 	Cls ; Limpiamos la pantalla
 	RenderWorld ; Renderizamos la escena
-	logicaJuego(cubo, luz, texturaCubo, camara) ; Llamamos a la funci√≥n de la l√≥gica para que se ejecute
+	logicaJuego(cubo, luz, texturaCubo, camara) ; Llamamos a la funciÛn de la lÛgica para que se ejecute
 	dibujatexto(resWidth#,resHeight#, 0, 0, 0, 0) ; Dibujamos la sombra del texto
 	dibujatexto(resWidth#,resHeight#, -2, 255,255,255) ; Dibujamos el texto
 	Flip ; Mandamos todo lo que se ha dibujado en memoria a la pantalla
