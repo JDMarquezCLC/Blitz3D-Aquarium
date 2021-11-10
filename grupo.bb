@@ -64,7 +64,7 @@ PositionEntity datosPescados(1,1),9999,9999,9999
 PositionEntity datosPescados(2,1),9999,9999,9999
 
 
-Dim datos2Pescados# (2,8)
+Dim datos2Pescados# (2,9)
 datos2Pescados(1,1) = -32 ;MinX
 datos2Pescados(1,2) = -48 ;MaxX
 datos2Pescados(2,1) = -25
@@ -86,6 +86,12 @@ datos2Pescados(1,7) = 0.1 	;Min speed
 datos2Pescados(1,8) = 0.5	    ;Max speed
 datos2Pescados(2,7) = 0.25 
 datos2Pescados(2,8) = 0.8	
+
+datos2Pescados(1,9) = 800 ;Spawn rate
+datos2Pescados(2,9) = 600
+
+
+
 
 ; Manipulación de entidades inicial
 
@@ -144,13 +150,23 @@ Dim pescaosEnt(maxFish,2) ; Array con los modelos y texturas de los pescaos
 
 Function spawnFish(a,b)
 
+			Local selected = 0 ; ¿Se ha podido elegir el modelo del pescado ya?
+			Local randChance = 0 ; Esto se usa para generar la probabilidad de que salga el pescao
+
 
 			If b=0 Then
 				pescaos(a,1) = Rnd(datos2Pescados(pescaos(a,5),1),datos2Pescados(pescaos(a,5),2))
 				pescaos(a,2) = Rnd(datos2Pescados(pescaos(a,5),3),datos2Pescados(pescaos(a,5),4))
 				pescaos(a,3) = Rnd(datos2Pescados(pescaos(a,5),5),datos2Pescados(pescaos(a,5),6))
 				pescaos(a,4) = Rnd(datos2Pescados(pescaos(a,5),7),datos2Pescados(pescaos(a,5),8))
-				pescaos(a,5) = Rand(1,2)
+				While selected = 0
+					pescaos(a,5) = Rand(1,2)
+					randChance = Rand(0,1000)
+					If randChance <= datos2Pescados(pescaos(a,5),9) Then
+						selected = 1
+					End If
+				Wend
+				
 				pescaosEnt(a,1) = CopyEntity(datosPescados(pescaos(a,5),1))
 				pescaosEnt(a,2) = datosPescados(pescaos(a,5),2)
 
@@ -171,7 +187,13 @@ Function spawnFish(a,b)
 			pescaos(a,2) = Rnd(datos2Pescados(pescaos(a,5),3),datos2Pescados(pescaos(a,5),4))
 			pescaos(a,3) = Rnd(datos2Pescados(pescaos(a,5),5),datos2Pescados(pescaos(a,5),6))
 			pescaos(a,4) = Rnd(datos2Pescados(pescaos(a,5),7),datos2Pescados(pescaos(a,5),8))
-			pescaos(a,5) = Rand(1,2)
+			While selected = 0
+					pescaos(a,5) = Rand(1,2)
+					randChance = Rand(0,1000)
+					If randChance <= datos2Pescados(pescaos(a,5),9) Then
+						selected = 1
+					End If
+			Wend
 			
 			
 
