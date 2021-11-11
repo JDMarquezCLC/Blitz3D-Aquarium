@@ -69,7 +69,7 @@ For ifd=1 To maxFishData
 Next
 
 
-Dim datos2Pescados# (maxFishData,9)
+Dim datos2Pescados# (maxFishData,11)
 datos2Pescados(1,1) = -32 ;MinX
 datos2Pescados(1,2) = -48 ;MaxX
 datos2Pescados(2,1) = -25
@@ -97,12 +97,20 @@ datos2Pescados(1,7) = 0.1 	;Min speed
 datos2Pescados(1,8) = 0.5	    ;Max speed
 datos2Pescados(2,7) = 0.25 
 datos2Pescados(2,8) = 0.8
-datos2Pescados(3,7) = 0.1 	
-datos2Pescados(3,8) = 0.5	
+datos2Pescados(3,7) = 0.01 	
+datos2Pescados(3,8) = 0.1	
 
-datos2Pescados(1,9) = 800 ;Spawn rate
-datos2Pescados(2,9) = 600
-datos2Pescados(3,9) = 800
+datos2Pescados(1,9) = 8000 ;Spawn rate
+datos2Pescados(2,9) = 6000
+datos2Pescados(3,9) = 1
+
+datos2Pescados(1,10) = 0.25 ;Min Size
+datos2Pescados(2,10) = 0.30
+datos2Pescados(3,10) = 2
+
+datos2Pescados(1,11) = 1 ;Max Size
+datos2Pescados(2,11) = 0.5
+datos2Pescados(3,11) = 6
 
 
 
@@ -168,6 +176,7 @@ Function spawnFish(a,b)
 
 			Local selected = 0 ; ¿Se ha podido elegir el modelo del pescado ya?
 			Local randChance = 0 ; Esto se usa para generar la probabilidad de que salga el pescao
+			Local escala# = 0 ; Escala de los peces
 
 
 			If b=0 Then
@@ -177,7 +186,7 @@ Function spawnFish(a,b)
 				pescaos(a,4) = Rnd(datos2Pescados(pescaos(a,5),7),datos2Pescados(pescaos(a,5),8))
 				While selected = 0
 					pescaos(a,5) = Rand(1,maxFishData)
-					randChance = Rand(0,1000)
+					randChance = Rand(0,10000)
 					If randChance <= datos2Pescados(pescaos(a,5),9) Then
 						selected = 1
 					End If
@@ -197,6 +206,9 @@ Function spawnFish(a,b)
 			pescaosEnt(a,2) = datosPescados(pescaos(a,5),2)
 			EntityTexture pescaosEnt(a,1),pescaosEnt(a,2)
 			RotateEntity pescaosEnt(a,1),0,90,0
+			escala = Rnd(datos2Pescados(pescaos(a,5),10),datos2Pescados(pescaos(a,5),11))
+			ScaleEntity pescaosEnt(a,1),escala,escala,escala
+			
 
 
 			pescaos(a,1) = Rnd(datos2Pescados(pescaos(a,5),1),datos2Pescados(pescaos(a,5),2))
@@ -205,7 +217,7 @@ Function spawnFish(a,b)
 			pescaos(a,4) = Rnd(datos2Pescados(pescaos(a,5),7),datos2Pescados(pescaos(a,5),8))
 			While selected = 0
 					pescaos(a,5) = Rand(1,maxFishData)
-					randChance = Rand(0,1000)
+					randChance = Rand(0,10000)
 					If randChance <= datos2Pescados(pescaos(a,5),9) Then
 						selected = 1
 					End If
@@ -401,6 +413,12 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 
 
 		End If
+		;For ia=1 To 3
+		;	If balasJugador(ia,3) < (pescaos(i,3) + 50) And balasJugador(ia,3) > (pescaos(i,3) - 50) Then
+		;		spawnFish(i,1)
+		;		balasJugador(ia,3) = 9999
+		;	End If
+		;Next
 	Next
 
 
@@ -473,11 +491,11 @@ Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3, fp
 	For i=1 To maxFish
 		Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia, i
 		For z=1 To 5
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 28*z, pescaos(i,z)
+			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 24*z, pescaos(i,z)
 		Next
-		For z=6 To 14
+		For z=6 To 16
 			
-				Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 28*z, (datos2Pescados(pescaos(i,5),z-5))
+				Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 24*z, (datos2Pescados(pescaos(i,5),z-5))
 			
 		Next
 		;z=6
