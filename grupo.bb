@@ -53,49 +53,65 @@ Global camMode = 0
 Global cantidadBalas = 0
 Global delayBalas = 0
 Global maxFish = 100
+Global activaTexto = 1
+Global maxFishData = 3
 
 
-Dim datosPescados(2,2)
+Dim datosPescados(maxFishData,2)
 datosPescados(1,1) = LoadMesh("pescao.3ds") 
-datosPescados(2,1) = LoadMesh("pescao2.3ds") 
+datosPescados(2,1) = LoadMesh("pescao2.3ds")
+datosPescados(3,1) = LoadMesh("tiburon.3ds") 
 datosPescados(1,2) = LoadTexture("pescao.png")
 datosPescados(2,2) = LoadTexture("pescao2.png")
-PositionEntity datosPescados(1,1),9999,9999,9999
-PositionEntity datosPescados(2,1),9999,9999,9999
+datosPescados(3,2) = LoadTexture("tiburon.png")
+For ifd=1 To maxFishData
+	PositionEntity datosPescados(ifd,1),9999,9999,9999
+Next
 
 
-Dim datos2Pescados# (2,9)
+Dim datos2Pescados# (maxFishData,9)
 datos2Pescados(1,1) = -32 ;MinX
 datos2Pescados(1,2) = -48 ;MaxX
 datos2Pescados(2,1) = -25
 datos2Pescados(2,2) = -30
+datos2Pescados(3,1) = -32
+datos2Pescados(3,2) = -48 
 
 
 datos2Pescados(1,3) = -0.5 	;MinY
 datos2Pescados(1,4) = 8	    ;MaxY
 datos2Pescados(2,3) = -0.5 	
 datos2Pescados(2,4) = 3
+datos2Pescados(3,3) = -0.5 	
+datos2Pescados(3,4) = 8	
 
 
 datos2Pescados(1,5) = -12 	;MinZ
 datos2Pescados(1,6) = 22	    ;MaxZ 
 datos2Pescados(2,5) = -12 
-datos2Pescados(2,6) = 22	   
+datos2Pescados(2,6) = 22	
+datos2Pescados(3,5) = -12 
+datos2Pescados(3,6) = 22   
 
 datos2Pescados(1,7) = 0.1 	;Min speed
 datos2Pescados(1,8) = 0.5	    ;Max speed
 datos2Pescados(2,7) = 0.25 
-datos2Pescados(2,8) = 0.8	
+datos2Pescados(2,8) = 0.8
+datos2Pescados(3,7) = 0.1 	
+datos2Pescados(3,8) = 0.5	
 
 datos2Pescados(1,9) = 800 ;Spawn rate
 datos2Pescados(2,9) = 600
+datos2Pescados(3,9) = 800
+
+
 
 
 
 
 ; Manipulación de entidades inicial
 
-ScaleEntity habitacion,20.0,10.0,20.0
+ScaleEntity habitacion,20.0,20.0,40.0
 ScaleEntity cubo,0.75,0.75,0.75
 rotYCubo# = 180
 PositionEntity habitacion,0,0,5
@@ -160,7 +176,7 @@ Function spawnFish(a,b)
 				pescaos(a,3) = Rnd(datos2Pescados(pescaos(a,5),5),datos2Pescados(pescaos(a,5),6))
 				pescaos(a,4) = Rnd(datos2Pescados(pescaos(a,5),7),datos2Pescados(pescaos(a,5),8))
 				While selected = 0
-					pescaos(a,5) = Rand(1,2)
+					pescaos(a,5) = Rand(1,maxFishData)
 					randChance = Rand(0,1000)
 					If randChance <= datos2Pescados(pescaos(a,5),9) Then
 						selected = 1
@@ -188,7 +204,7 @@ Function spawnFish(a,b)
 			pescaos(a,3) = Rnd(datos2Pescados(pescaos(a,5),5),datos2Pescados(pescaos(a,5),6))
 			pescaos(a,4) = Rnd(datos2Pescados(pescaos(a,5),7),datos2Pescados(pescaos(a,5),8))
 			While selected = 0
-					pescaos(a,5) = Rand(1,2)
+					pescaos(a,5) = Rand(1,maxFishData)
 					randChance = Rand(0,1000)
 					If randChance <= datos2Pescados(pescaos(a,5),9) Then
 						selected = 1
@@ -260,6 +276,15 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 	If KeyDown(31)
 		rotXCubo# = rotXCubo# - velocidadCubo#
 		camX# = camX# - velocidadCubo#
+	End If
+
+
+	If KeyDown(20)
+		If activaTexto = 0 Then
+			activaTexto = 1
+		Else
+			activaTexto = 0
+		End If
 	End If
 
 
@@ -443,28 +468,34 @@ Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3, fp
 	Text resWidth#*4/100+ distancia,resHeight#*84/100+ distancia,"Usa las flechas de dirección para mover el cubo.",0,0
 	Text resWidth#*4/100+ distancia,resHeight#*88/100+ distancia,"Usa las teclas Q y E para subir y bajar el cubo.",0,0
 	Text resWidth#*4/100+ distancia,resHeight#*92/100+ distancia,"Usa las teclas + y - del teclado numérico para cambiar la velocidad.",0,0
+	Text resWidth#*4/100+ distancia,resHeight#*96/100+ distancia,"Pulsa la T para activar/desactivar este texto.",0,0
 
 	For i=1 To maxFish
 		Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia, i
 		For z=1 To 5
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, pescaos(i,z)
+			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 28*z, pescaos(i,z)
 		Next
-		z=6
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),1))
-		z=7
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),2))
-		z=8
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),3))
-		z=9
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),4))
-		z=10
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),5))
-		z=11
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),6))
-		z=12
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),7))
-		z=13
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),8))
+		For z=6 To 14
+			
+				Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 28*z, (datos2Pescados(pescaos(i,5),z-5))
+			
+		Next
+		;z=6
+		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),1))
+		;z=7
+		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),2))
+		;z=8
+		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),3))
+		;z=9
+		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),4))
+		;z=10
+		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),5))
+		;z=11
+		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),6))
+		;z=12
+		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),7))
+		;z=13
+		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),8))
 	Next
 
 
@@ -500,8 +531,11 @@ While running = 1 ; Este es el bucle del juego, está corriendo constantemente
 		logicaJuego(cubo, luz, texturaCubo, camara) ; Llamamos a la función de la lógica para que se ejecute
 	EndIf
 	
-	dibujatexto(resWidth#,resHeight#, 0, 0, 0, 0, fps) ; Dibujamos la sombra del texto
-	dibujatexto(resWidth#,resHeight#, -2, 255,255,255, fps) ; Dibujamos el texto
+
+	If activaTexto = 1 Then
+		dibujatexto(resWidth#,resHeight#, 0, 0, 0, 0, fps) ; Dibujamos la sombra del texto
+		dibujatexto(resWidth#,resHeight#, -2, 255,255,255, fps) ; Dibujamos el texto
+	End If
 
 	Flip ; Mandamos todo lo que se ha dibujado en memoria a la pantalla
 
