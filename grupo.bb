@@ -11,8 +11,8 @@ Const D3DTEXF_LINEAR = 2
 ; FIN DE LAS VARIABLES DEL ARREGLO DE FILTRADO DE TEXTURAS
 
 
-Local resWidth#=Float 1280 ; Resolución horizontal
-Local resHeight#=Float 720 ; Resolución vertical
+Local resWidth#=Float 320 ; Resolución horizontal
+Local resHeight#=Float 240 ; Resolución vertical
 Local resCd=32 ; Profundidad de color
 Local resWindow=2 ; Modo ventana: 2, pantalla completa 1
 
@@ -23,6 +23,10 @@ SetBuffer BackBuffer()
 
 Local running=1 ; ¿Está el programa corriendo?
 Local cubo=LoadMesh("pescao.3ds") 
+
+
+
+
 Local camara=CreateCamera()
 Local habitacion=CreateCube()
 Local luz=CreateLight(1)
@@ -55,7 +59,11 @@ Global delayBalas = 0
 Global maxFish = 100
 Global activaTexto = 1
 Global maxFishData = 3
+;Global type_bala = 1
+;Global type_fish = 2
 
+
+EntityType cubo,type_bala
 
 Dim datosPescados(maxFishData,2)
 datosPescados(1,1) = LoadMesh("pescao.3ds") 
@@ -64,12 +72,16 @@ datosPescados(3,1) = LoadMesh("tiburon.3ds")
 datosPescados(1,2) = LoadTexture("pescao.png")
 datosPescados(2,2) = LoadTexture("pescao2.png")
 datosPescados(3,2) = LoadTexture("tiburon.png")
+
+
+
+
 For ifd=1 To maxFishData
 	PositionEntity datosPescados(ifd,1),9999,9999,9999
 Next
 
 
-Dim datos2Pescados# (maxFishData,11)
+Dim datos2Pescados# (maxFishData,14)
 datos2Pescados(1,1) = -32 ;MinX
 datos2Pescados(1,2) = -48 ;MaxX
 datos2Pescados(2,1) = -25
@@ -112,7 +124,27 @@ datos2Pescados(1,11) = 1 ;Max Size
 datos2Pescados(2,11) = 0.5
 datos2Pescados(3,11) = 6
 
+datos2Pescados(3,12) = 1 ; Hitbox X Scale
+datos2Pescados(3,14) = 1.44681370886 ; Hitbox Y Scale
+datos2Pescados(3,13) = 0.579921469776 ; Hitbox Z Scale
 
+datos2Pescados(1,12) = 1 
+datos2Pescados(1,13) = 1.86157181923
+datos2Pescados(1,14) = 3.09757123671 
+
+datos2Pescados(2,12) = 1 
+datos2Pescados(2,13) = 4.05156902511
+datos2Pescados(2,14) = 4.05156902511
+
+;datosPescados(1,1) = CreateCube()
+;datosPescados(2,1) = CreateCube()
+;datosPescados(3,1) = CreateCube()
+;PositionEntity datosPescados(1,1),5,0,0
+;PositionEntity datosPescados(2,1),0,5,0
+;PositionEntity datosPescados(3,1),0,0,5
+;ScaleEntity datosPescados(1,1),datos2Pescados(1,12),datos2Pescados(1,13),datos2Pescados(1,14)
+;ScaleEntity datosPescados(2,1),datos2Pescados(2,12),datos2Pescados(2,13),datos2Pescados(2,14)
+;ScaleEntity datosPescados(3,1),datos2Pescados(3,12),datos2Pescados(3,13),datos2Pescados(3,14)
 
 
 
@@ -131,6 +163,7 @@ EntityTexture habitacion,texturaSuelo
 Dim balasJugador (3,6) ; Array de las balas del jugador
 For i=1 To 3 
 	balasJugador(i,6)=CreateCube() ;Creación de bala
+	;EntityType balasJugador(i,6),type_bala
 	For z=1 To 2
 		balasJugador(i,z)=9999 ; Posición inicial
 	Next
@@ -140,7 +173,7 @@ Next
 ; Podremos almacenar hasta 3 balas, y cada una tendrá 3 coordenadas de posición y una velocidad, y un último valor para saber si debe moverse o no, el último de verdad es para el modelo
 
 
-Dim pescaos# (maxFish,6) ; Array de peces
+Dim pescaos# (maxFish,7) ; Array de peces
 ;posX,posY,posZ,velocidad,IDentidad
 
 
@@ -193,6 +226,7 @@ Function spawnFish(a,b)
 				Wend
 				
 				pescaosEnt(a,1) = CopyEntity(datosPescados(pescaos(a,5),1))
+				;EntityType pescaosEnt(a,1),type_fish
 				pescaosEnt(a,2) = datosPescados(pescaos(a,5),2)
 
 
@@ -208,6 +242,7 @@ Function spawnFish(a,b)
 			RotateEntity pescaosEnt(a,1),0,90,0
 			escala = Rnd(datos2Pescados(pescaos(a,5),10),datos2Pescados(pescaos(a,5),11))
 			ScaleEntity pescaosEnt(a,1),escala,escala,escala
+			pescaos(a,7) = escala
 			
 
 
@@ -391,6 +426,7 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 
 	;Actualizar peces
 	For i=1 To maxFish
+		Local box_range# = 1 ;+ pescaos(i,7)
 		PositionEntity pescaosEnt(i,1), pescaos(i,1), pescaos(i,2), pescaos(i,3)
 		pescaos(i,1) = pescaos(i,1) + pescaos(i,4)
 		If pescaos(i,1) > 32
@@ -413,12 +449,23 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 
 
 		End If
-		;For ia=1 To 3
-		;	If balasJugador(ia,3) < (pescaos(i,3) + 50) And balasJugador(ia,3) > (pescaos(i,3) - 50) Then
-		;		spawnFish(i,1)
-		;		balasJugador(ia,3) = 9999
-		;	End If
-		;Next
+		For ia=1 To 3 ; Colisión con balas
+			Local zColM# = pescaos(i,3) + box_range * (datos2Pescados(pescaos(a,5),14))
+			Local zColN# = pescaos(i,3) - box_range * (datos2Pescados(pescaos(a,5),14))
+			Local yColM# = pescaos(i,2) + box_range * (datos2Pescados(pescaos(a,5),13))
+			Local yColN# = pescaos(i,2) - box_range * (datos2Pescados(pescaos(a,5),13))
+			Local xColM# = pescaos(i,1) + box_range * (datos2Pescados(pescaos(a,5),12))
+			Local xColN# = pescaos(i,1) - box_range * (datos2Pescados(pescaos(a,5),12))
+			If balasJugador(ia,3) < (zColM) And balasJugador(ia,3) > (zColN) And balasJugador(ia,2) < (yColM) And balasJugador(ia,2) > (zColN) And balasJugador(ia,1) < (xColM) And balasJugador(ia,1) > (xColN)
+
+				
+				
+
+
+				spawnFish(i,1)
+				balasJugador(ia,3) = 9999
+			End If
+		Next
 	Next
 
 
@@ -428,6 +475,8 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 
 	cantidadBalas = balasJugador(1,5) + balasJugador(2,5) + balasJugador(3,5)
 	
+
+	Collisions type_bala,type_fish,3,1
 
 End Function
 
@@ -536,6 +585,7 @@ While running = 1 ; Este es el bucle del juego, está corriendo constantemente
 
 	Cls ; Limpiamos la pantalla
 	RenderWorld ; Renderizamos la escena
+	UpdateWorld ;Necesario para colisiones
 	If (MilliSecs() - fpsTimer > 1000)
 		fpsTimer = MilliSecs()
 		fps = fpsTicks
