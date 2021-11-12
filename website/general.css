@@ -1,0 +1,61 @@
+body {
+	background-image:url(fondoblndr.gif);
+	 background-repeat: no-repeat;
+	 background-size: cover;
+	 background-attachment: fixed;
+}
+
+#descripcion, #menu {
+	text-align: center;
+	margin-top: 3%;
+}
+
+#encabezado p {
+	text-align: center;
+}
+
+#descripcion, #zonapeces {
+	width: 50%;
+	color: #FFFFFF;
+	text-align: center;
+	margin: auto;
+	margin-top: 3%;
+}
+
+#zonapeces img {
+	width: 40%;
+	height: 20%;
+}
+
+
+.btn {
+  background: #b5e1ff;
+  background-image: -webkit-linear-gradient(top, #b5e1ff, #354894);
+  background-image: -moz-linear-gradient(top, #b5e1ff, #354894);
+  background-image: -ms-linear-gradient(top, #b5e1ff, #354894);
+  background-image: -o-linear-gradient(top, #b5e1ff, #354894);
+  background-image: linear-gradient(to bottom, #b5e1ff, #354894);
+  -webkit-border-radius: 22;
+  -moz-border-radius: 22;
+  border-radius: 22px;
+  text-shadow: 1px 1px 6px #000000;
+  -webkit-box-shadow: 3px 5px 9px #050505;
+  -moz-box-shadow: 3px 5px 9px #050505;
+  box-shadow: 3px 5px 9px #050505;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 33px;
+  padding: 14px;
+  border: solid #0b2670 3px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #e0f3ff;
+  background-image: -webkit-linear-gradient(top, #e0f3ff, #93c5e6);
+  background-image: -moz-linear-gradient(top, #e0f3ff, #93c5e6);
+  background-image: -ms-linear-gradient(top, #e0f3ff, #93c5e6);
+  background-image: -o-linear-gradient(top, #e0f3ff, #93c5e6);
+  background-image: linear-gradient(to bottom, #e0f3ff, #93c5e6);
+  text-decoration: none;
+}
