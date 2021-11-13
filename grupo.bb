@@ -11,8 +11,8 @@ Const D3DTEXF_LINEAR = 2
 ; FIN DE LAS VARIABLES DEL ARREGLO DE FILTRADO DE TEXTURAS
 
 
-Local resWidth#=Float 320 ; Resolución horizontal
-Local resHeight#=Float 240 ; Resolución vertical
+Local resWidth#=Float 1280; Resolución horizontal
+Local resHeight#=Float 720 ; Resolución vertical
 Local resCd=32 ; Profundidad de color
 Local resWindow=2 ; Modo ventana: 2, pantalla completa 1
 
@@ -59,6 +59,10 @@ Global delayBalas = 0
 Global maxFish = 100
 Global activaTexto = 1
 Global maxFishData = 3
+
+Dim colisions#(6)
+
+
 ;Global type_bala = 1
 ;Global type_fish = 2
 
@@ -105,12 +109,12 @@ datos2Pescados(2,6) = 22
 datos2Pescados(3,5) = -12 
 datos2Pescados(3,6) = 22   
 
-datos2Pescados(1,7) = 0.1 	;Min speed
-datos2Pescados(1,8) = 0.5	    ;Max speed
-datos2Pescados(2,7) = 0.25 
-datos2Pescados(2,8) = 0.8
-datos2Pescados(3,7) = 0.01 	
-datos2Pescados(3,8) = 0.1	
+datos2Pescados(1,7) = 0.1 	;Min speed ; Should be 0.1
+datos2Pescados(1,8) = 0.5	    ;Max speed ;Should be 0.5
+datos2Pescados(2,7) = 0.25  ;Should be 0.25
+datos2Pescados(2,8) = 0.8 ;Should be 0.8
+datos2Pescados(3,7) = 0.01 	;Should be 0.01
+datos2Pescados(3,8) = 0.1	;Should be 0.1
 
 datos2Pescados(1,9) = 8000 ;Spawn rate
 datos2Pescados(2,9) = 6000
@@ -124,17 +128,17 @@ datos2Pescados(1,11) = 1 ;Max Size
 datos2Pescados(2,11) = 0.5
 datos2Pescados(3,11) = 6
 
-datos2Pescados(3,12) = 1 ; Hitbox X Scale
-datos2Pescados(3,14) = 1.44681370886 ; Hitbox Y Scale
-datos2Pescados(3,13) = 0.579921469776 ; Hitbox Z Scale
+datos2Pescados(3,12) = 2.8 ; Hitbox X Scale
+datos2Pescados(3,13) = 1.44681370886 ; Hitbox Y Scale
+datos2Pescados(3,14) = 0.579921469776 ; Hitbox Z Scale
 
-datos2Pescados(1,12) = 1 
-datos2Pescados(1,13) = 1.86157181923
-datos2Pescados(1,14) = 3.09757123671 
+datos2Pescados(1,12) = 1.5 
+datos2Pescados(1,13) = 1.06157181923
+datos2Pescados(1,14) = 1.09757123671 
 
 datos2Pescados(2,12) = 1 
-datos2Pescados(2,13) = 4.05156902511
-datos2Pescados(2,14) = 4.05156902511
+datos2Pescados(2,13) = 1.05156902511
+datos2Pescados(2,14) = 1.05156902511
 
 ;datosPescados(1,1) = CreateCube()
 ;datosPescados(2,1) = CreateCube()
@@ -160,14 +164,15 @@ CameraViewport camara,0,0,resWidth#,resHeight#
 EntityTexture habitacion,texturaSuelo
 
 ;Creación de las balas
-Dim balasJugador (3,6) ; Array de las balas del jugador
+Dim balasJugador#(3,6) ; Array de las balas del jugador
+Dim balasJugadorModelo(3)
 For i=1 To 3 
-	balasJugador(i,6)=CreateCube() ;Creación de bala
+	balasJugadorModelo(i)=CreateCube() ;Creación de bala
 	;EntityType balasJugador(i,6),type_bala
 	For z=1 To 2
 		balasJugador(i,z)=9999 ; Posición inicial
 	Next
-	ScaleEntity balasJugador(i,6),0.25,0.25,0.25
+	ScaleEntity balasJugadorModelo(i),0.25,0.25,0.25
 Next
 
 ; Podremos almacenar hasta 3 balas, y cada una tendrá 3 coordenadas de posición y una velocidad, y un último valor para saber si debe moverse o no, el último de verdad es para el modelo
@@ -407,7 +412,7 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 	End If
 	;ACtualizar balas
 	For i=1 To 3
-		PositionEntity balasJugador(i,6), balasJugador(i,1), balasJugador(i,2), balasJugador(i,3)
+		PositionEntity balasJugadorModelo(i), balasJugador(i,1), balasJugador(i,2), balasJugador(i,3)
 		If balasJugador(i,5) = 1
 			balasJugador(i,3) = balasJugador(i,3) + balasJugador(i,4)
 		End If
@@ -426,7 +431,7 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 
 	;Actualizar peces
 	For i=1 To maxFish
-		Local box_range# = 1 ;+ pescaos(i,7)
+		Local box_range# = 1 + pescaos(i,7)
 		PositionEntity pescaosEnt(i,1), pescaos(i,1), pescaos(i,2), pescaos(i,3)
 		pescaos(i,1) = pescaos(i,1) + pescaos(i,4)
 		If pescaos(i,1) > 32
@@ -450,20 +455,33 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 
 		End If
 		For ia=1 To 3 ; Colisión con balas
-			Local zColM# = pescaos(i,3) + box_range * (datos2Pescados(pescaos(a,5),14))
-			Local zColN# = pescaos(i,3) - box_range * (datos2Pescados(pescaos(a,5),14))
-			Local yColM# = pescaos(i,2) + box_range * (datos2Pescados(pescaos(a,5),13))
-			Local yColN# = pescaos(i,2) - box_range * (datos2Pescados(pescaos(a,5),13))
-			Local xColM# = pescaos(i,1) + box_range * (datos2Pescados(pescaos(a,5),12))
-			Local xColN# = pescaos(i,1) - box_range * (datos2Pescados(pescaos(a,5),12))
-			If balasJugador(ia,3) < (zColM) And balasJugador(ia,3) > (zColN) And balasJugador(ia,2) < (yColM) And balasJugador(ia,2) > (zColN) And balasJugador(ia,1) < (xColM) And balasJugador(ia,1) > (xColN)
-
+			Local zColM# = pescaos(i,3) + box_range * (datos2Pescados(pescaos(i,5),14))
+			Local zColN# = pescaos(i,3) - box_range * (datos2Pescados(pescaos(i,5),14))
+			Local yColM# = pescaos(i,2) + box_range * (datos2Pescados(pescaos(i,5),13))
+			Local yColN# = pescaos(i,2) - box_range * (datos2Pescados(pescaos(i,5),13))
+			Local xColM# = pescaos(i,1) + box_range * (datos2Pescados(pescaos(i,5),12))
+			Local xColN# = pescaos(i,1) - box_range * (datos2Pescados(pescaos(i,5),12))
+			colisions(0) = zColM
+			colisions(1) = zColN
+			colisions(2) = yColM
+			colisions(3) = yColN
+			colisions(4) = xColM
+			colisions(5) = xColN
+			If balasJugador(ia,3) < (zColM) 
+				If balasJugador(ia,3) > (zColN) 
 				
-				
-
-
-				spawnFish(i,1)
-				balasJugador(ia,3) = 9999
+					If balasJugador(ia,2) < (yColM) 
+						If balasJugador(ia,2) > (yColN) 
+					
+							If balasJugador(ia,1) < (xColM) 
+								If balasJugador(ia,1) > (xColN)
+									spawnFish(i,1)
+									balasJugador(ia,3) = 9999
+								End If
+							End If
+						End If
+					End If
+				End If
 			End If
 		Next
 	Next
@@ -521,15 +539,18 @@ Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3, fp
 	Text resWidth#*4/100+ distancia,resHeight#*28/100+ distancia,"Cantidad de balas disparadas:"+ cantidadBalas 
 	Text resWidth#*4/100+ distancia,resHeight#*32/100+ distancia,"Delay balas:" + delayBalas
 	For i=1 To 3
-		Text resWidth#*4/100+ distancia + Len("Array balas:") + 32*i,resHeight#*36/100+ distancia, i
+		Text resWidth#*4/100+ distancia + Len("Array balas:") + 50*i,resHeight#*36/100+ distancia, i
 		For z=1 To 5
-			Text resWidth#*4/100+ distancia + Len("Array balas:") + 32*i,resHeight#*36/100+ distancia + 32*z, balasJugador(i,z)
+			Text resWidth#*4/100+ distancia + Len("Array balas:") + 50*i,resHeight#*36/100+ distancia + 32*z, balasJugador(i,z)
 		Next
 	Next
 	Text resWidth#*50/100+ distancia,resHeight#*4/100+ distancia,"Cámara lateral = Tecla P"
 	Text resWidth#*50/100+ distancia,resHeight#*8/100+ distancia,"WASD para rotar el cubo"
 	Text resWidth#*50/100+ distancia,resHeight#*12/100+ distancia,"Espacio para disparar"
 	Text resWidth#*50/100+ distancia,resHeight#*20/100+ distancia,"FPS: " + fps,0,0
+	For colText=0 To 5
+		Text resWidth#*30/100+ distancia,resHeight#*(24+(4*colText))/100+ distancia,"Cols: " + colisions(colText),0,0
+	Next
 
 
 	Text resWidth#*4/100+ distancia,resHeight#*84/100+ distancia,"Usa las flechas de dirección para mover el cubo.",0,0
