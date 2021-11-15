@@ -22,21 +22,23 @@ SeedRnd(MilliSecs())
 SetBuffer BackBuffer() 
 
 Local running=1 ; ¿Está el programa corriendo?
-Local cubo=LoadMesh("pescao.3ds") 
+Local cubo=LoadMesh("juanv4.b3d") 
 
 
 
 
 Local camara=CreateCamera()
-Local habitacion=CreateCube()
+Local habitacion=LoadMesh("suelo.3ds") 
 Local luz=CreateLight(1)
-Local texturaCubo = LoadTexture("pescao.png")
-Local texturaSuelo = LoadTexture("pared.png")
+Local texturaCubo = LoadTexture("juan.png")
+Local texturaSuelo = LoadTexture("arena.png")
+Local oldCubo = LoadTexture("cubo.png")
 Local fpsTimer
 Local fps
 Local fpsTicks
 Local logicTimer
 Local logicTicks
+Local scenCubo=CreateCube()
 
 ; Creación de variables globales, que pueden ser accedidas desde cualquier sitio
 
@@ -155,12 +157,28 @@ datos2Pescados(2,14) = 1.05156902511
 
 ; Manipulación de entidades inicial
 
-ScaleEntity habitacion,20.0,20.0,40.0
-ScaleEntity cubo,0.75,0.75,0.75
-rotYCubo# = 180
-PositionEntity habitacion,0,0,5
-FlipMesh habitacion 
+ScaleEntity habitacion,80.0,80.0,80.0
+ScaleEntity cubo,4,4,4
+;rotYCubo# = 90
+TurnEntity cubo,0,-90,0
+PositionEntity habitacion,0,-15,10
+PositionEntity scenCubo,36.5951,-19.4532,22.5235
+ScaleEntity scenCubo,0.75,0.75,0.75
+EntityTexture scenCubo,oldCubo
+;FlipMesh habitacion
+
+;PositionEntity camara, posXCubo#-2 , posYCubo# + 2, posZCubo# - 5
+
+EntityParent camara, cubo
+;MoveEntity camara,2,2,2
+RotateEntity camara,0,90,0
+MoveEntity camara,-0.35,0.25,-0.5
+
 CameraViewport camara,0,0,resWidth#,resHeight# 	
+CameraFogMode camara,1
+CameraFogRange camara,1,50
+CameraFogColor camara,1,60,117
+CameraClsColor camara,1,60,117
 EntityTexture habitacion,texturaSuelo
 
 ;Creación de las balas
@@ -279,19 +297,19 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 	
 	; CONTROLES DEL CUBO
 	If KeyDown(200)
-		posZCubo# = posZCubo# + velocidadCubo#
+		MoveEntity cubo,-velocidadCubo#,0,0
 	End If
 
 	If KeyDown(208)
-		posZCubo# = posZCubo# - velocidadCubo#
+		MoveEntity cubo,+velocidadCubo#,0,0
 	End If
 
 	If KeyDown(203)
-		posXCubo# = posXCubo# - velocidadCubo#
+		MoveEntity cubo,0,0,-velocidadCubo#
 	End If
 
 	If KeyDown(205)
-		posXCubo# = posXCubo# + velocidadCubo#
+		MoveEntity cubo,0,0,+velocidadCubo#
 	End If
 
 	If KeyDown(78)
@@ -303,31 +321,37 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 	End If
 
 	If KeyDown(16)
-		posYCubo# = posYCubo# + velocidadCubo#
+		;MoveEntity cubo,0,+velocidadCubo#,0
+		TurnEntity cubo,- velocidadCubo# * 2.5,0,0
 	End If
 
 	If KeyDown(18)
-		posYCubo# = posYCubo# - velocidadCubo#
+		;MoveEntity cubo,0,-velocidadCubo#,0
+		TurnEntity cubo,+ velocidadCubo# * 2.5,0,0
 	End If
 
 	If KeyDown(30)
-		rotYCubo# = rotYCubo# - velocidadCubo#
-		camY# = camY# - velocidadCubo#
+		;rotYCubo# = rotYCubo# - velocidadCubo# * 2.5 ;- 0.5
+		;camY# = camY# - velocidadCubo#
+		TurnEntity cubo,0,+ velocidadCubo# * 2.5,0
 	End If
 	If KeyDown(32)
-		rotYCubo# = rotYCubo# + velocidadCubo#
-		camY# = camY# + velocidadCubo#
+		;rotYCubo# = rotYCubo# + velocidadCubo# * 2.5 ;+ 0.5
+		;camY# = camY# + velocidadCubo#
+		TurnEntity cubo,0,- velocidadCubo# * 2.5,0
 	End If
 
 	If KeyDown(17)
-		rotXCubo# = rotXCubo# + velocidadCubo#
-		camX# = camX# + velocidadCubo#
+		;rotZCubo# = rotZCubo# - velocidadCubo# * 2.5 ;- 0.5
+		;camX# = camX# + velocidadCubo#
+		TurnEntity cubo,0,0,- velocidadCubo# * 2.5
 
 	End If
 
 	If KeyDown(31)
-		rotXCubo# = rotXCubo# - velocidadCubo#
-		camX# = camX# - velocidadCubo#
+		;rotZCubo# = rotZCubo# + velocidadCubo# * 2.5 ;+ 0.5
+		;camX# = camX# - velocidadCubo#
+		TurnEntity cubo,0,0,+ velocidadCubo# * 2.5
 	End If
 
 
@@ -387,13 +411,14 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 	; Una vez se han terminado las comprobaciones de controles, actualizamos las variables de posicionamiento y rotación
 	; de las entidades
 
-	PositionEntity cubo,posXCubo#, posYCubo#, posZCubo#
-	RotateEntity cubo,rotXCubo#, -rotYCubo#, rotZCubo#
+	;PositionEntity cubo,posXCubo#, posYCubo#, posZCubo#
+	;RotateEntity cubo,rotXCubo#, -rotYCubo#, rotZCubo#
+	;RotateEntity cubo,-camX#, -camY#, -camZ#
 	EntityTexture cubo,texturaCubo
 	
 	If camMode = 0 ; Si el modo de cámara es 0, vamos a poner la cámara detrás del cubo
-		PositionEntity camara, posXCubo# + 0.25, posYCubo# + 2, posZCubo# - 5
-		RotateEntity camara, -camX#, -camY#, -camZ#
+		;PositionEntity camara, posXCubo# , posYCubo# + 1, posZCubo# - 3
+		;RotateEntity camara, -camX#, -camY#, -camZ#
 		;RotateEntity camara,-rotXCubo#, -rotYCubo#, -rotZCubo#
 	End If
 
@@ -527,13 +552,13 @@ End Function
 ; FIN DE FUNCIONES DEL ARREGLO DE FILTRADO DE TEXTURAS
 
 
-Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3, fps)
+Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3, fps, cubo)
 
 	Color color1,color2,color3
 	Text resWidth#*4/100+ distancia,resHeight#*4/100 + distancia,"Resolución horizontal:"+resWidth#,0,0
 	Text resWidth#*4/100+ distancia,resHeight#*8/100+ distancia,"Resolución vertical:"+resHeight#,0,0
-	Text resWidth#*4/100+ distancia,resHeight#*12/100+ distancia,"Posición cubo:"+ posXCubo# + "," + posYCubo# + "," + posZCubo#
-	Text resWidth#*4/100+ distancia,resHeight#*16/100+ distancia,"Rotación cubo:"+ rotXCubo# + "," + rotYCubo# + "," + rotZCubo#
+	Text resWidth#*4/100+ distancia,resHeight#*12/100+ distancia,"Posición cubo:"+ EntityX(cubo) + "," + EntityY(cubo) + "," + EntityZ(cubo)
+	Text resWidth#*4/100+ distancia,resHeight#*16/100+ distancia,"Rotación cubo:"+ EntityPitch(cubo) + "," + EntityYaw(cubo) + "," + EntityRoll(cubo)
 	Text resWidth#*4/100+ distancia,resHeight#*20/100+ distancia,"Velocidad cubo:"+ velocidadCubo#
 	Text resWidth#*4/100+ distancia,resHeight#*24/100+ distancia,"Coordenadas del ratón:"+ MouseX() + "," + MouseY() + "," + MouseZ() 
 	Text resWidth#*4/100+ distancia,resHeight#*28/100+ distancia,"Cantidad de balas disparadas:"+ cantidadBalas 
@@ -622,8 +647,8 @@ While running = 1 ; Este es el bucle del juego, está corriendo constantemente
 	
 
 	If activaTexto = 1 Then
-		dibujatexto(resWidth#,resHeight#, 0, 0, 0, 0, fps) ; Dibujamos la sombra del texto
-		dibujatexto(resWidth#,resHeight#, -2, 255,255,255, fps) ; Dibujamos el texto
+		dibujatexto(resWidth#,resHeight#, 0, 0, 0, 0, fps,cubo) ; Dibujamos la sombra del texto
+		dibujatexto(resWidth#,resHeight#, -2, 255,255,255, fps,cubo) ; Dibujamos el texto
 	End If
 
 	Flip ; Mandamos todo lo que se ha dibujado en memoria a la pantalla
