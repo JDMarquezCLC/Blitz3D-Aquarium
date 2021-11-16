@@ -8,6 +8,7 @@ body {
 #descripcion, #menu {
 	text-align: center;
 	margin-top: 3%;
+	display:block;
 }
 
 #encabezado p {
@@ -15,7 +16,7 @@ body {
 }
 
 #descripcion, #zonapeces {
-	width: 50%;
+	width: 70%;
 	color: #FFFFFF;
 	text-align: center;
 	margin: auto;
@@ -35,19 +36,23 @@ body {
   background-image: -ms-linear-gradient(top, #b5e1ff, #354894);
   background-image: -o-linear-gradient(top, #b5e1ff, #354894);
   background-image: linear-gradient(to bottom, #b5e1ff, #354894);
-  -webkit-border-radius: 22;
-  -moz-border-radius: 22;
-  border-radius: 22px;
-  text-shadow: 1px 1px 6px #000000;
-  -webkit-box-shadow: 3px 5px 9px #050505;
-  -moz-box-shadow: 3px 5px 9px #050505;
-  box-shadow: 3px 5px 9px #050505;
+  -webkit-border-radius: 1.375em;
+  -moz-border-radius: 1.375em;
+  border-radius: 1.375em;
+  text-shadow: 0.063em 0.063em 0.375em #000000;
+  -webkit-box-shadow: 0.188em 0.313em 0.563em #050505;
+  -moz-box-shadow: 0.188em 0.313em 0.563em #050505;
+  box-shadow: 0.188em 0.313em 0.563em #050505;
   font-family: Arial;
   color: #ffffff;
-  font-size: 33px;
-  padding: 14px;
-  border: solid #0b2670 3px;
+  font-size: 1.563em;
+  padding: 0.575em;
+  border: solid #0b2670 0.100em;
   text-decoration: none;
+  min-width: 10.870em;
+  max-width: 10.870em;
+  display: block;
+  text-align: center;
 }
 
 .btn:hover {
@@ -59,3 +64,42 @@ body {
   background-image: linear-gradient(to bottom, #e0f3ff, #93c5e6);
   text-decoration: none;
 }
+
+#menu div {
+	text-align: center;
+	margin: auto;
+	display: inline-block;
+}
+
+#menu {
+	max-width: 70%;
+	margin: auto;
+}
+
+.pescaos {
+	display: inline-block;
+	margin:auto;
+	
+}
+
+#zonapeces .pescaos img {
+	width: 12em;
+	height: 6em;
+}
+
+#zonapeces .16_9pic {
+	width: 45.9567em;
+	height: 25.7067em;
+}
+
+.devlogH {
+	font-size: 1.563em;
+}
+
+.devEntry {
+	text-align: left;
+}
+
+.divEntry {
+	background: rgba(0, 0, 0, 0.3);
+	padding: 2%;
