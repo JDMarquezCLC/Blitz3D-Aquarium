@@ -11,8 +11,8 @@ Const D3DTEXF_LINEAR = 2
 ; FIN DE LAS VARIABLES DEL ARREGLO DE FILTRADO DE TEXTURAS
 
 
-Local resWidth#=Float 1280; Resolución horizontal
-Local resHeight#=Float 720 ; Resolución vertical
+Local resWidth#=Float  1280; Resolución horizontal
+Local resHeight#=Float   720 ; Resolución vertical
 Local resCd=32 ; Profundidad de color
 Local resWindow=2 ; Modo ventana: 2, pantalla completa 1
 
@@ -58,9 +58,10 @@ Global camZ# = 0
 Global camMode = 0 
 Global cantidadBalas = 0
 Global delayBalas = 0
-Global maxFish = 100
+Global maxFish = 50
 Global activaTexto = 1
 Global maxFishData = 3
+Global currentMapChunk = 1
 
 Dim colisions#(6)
 
@@ -78,6 +79,36 @@ datosPescados(3,1) = LoadMesh("tiburon.3ds")
 datosPescados(1,2) = LoadTexture("pescao.png")
 datosPescados(2,2) = LoadTexture("pescao2.png")
 datosPescados(3,2) = LoadTexture("tiburon.png")
+
+
+Dim datosMapa(2,7)
+datosMapa(1,1) = "suelo.3ds"
+datosMapa(1,2) = 80
+datosMapa(1,3) = 80
+datosMapa(1,4) = 80
+datosMapa(1,5) = 0
+datosMapa(1,6) = -15
+datosMapa(1,7) = 10
+
+
+
+
+datosMapa(2,1) = "suelo.3ds"
+datosMapa(2,2) = 80
+datosMapa(2,3) = 80
+datosMapa(2,4) = 80
+datosMapa(2,5) = 0
+datosMapa(2,6) = -15
+datosMapa(2,7) = 90
+
+
+datosMapa(3,1) = "suelo.3ds"
+datosMapa(3,2) = 80
+datosMapa(3,3) = 80
+datosMapa(3,4) = 80
+datosMapa(3,5) = 0
+datosMapa(3,6) = -15
+datosMapa(3,7) = 170
 
 
 
@@ -174,11 +205,16 @@ EntityParent camara, cubo
 RotateEntity camara,0,90,0
 MoveEntity camara,-0.35,0.25,-0.5
 
+
+MoveEntity camara,0,2,-8
+
+
 CameraViewport camara,0,0,resWidth#,resHeight# 	
-CameraFogMode camara,1
-CameraFogRange camara,1,50
-CameraFogColor camara,1,60,117
-CameraClsColor camara,1,60,117
+;CameraFogMode camara,1
+;CameraFogRange camara,1,50
+;CameraFogColor camara,1,60,117
+;CameraClsColor camara,1,60,117
+;CameraRange camara,1,60
 EntityTexture habitacion,texturaSuelo
 
 ;Creación de las balas
@@ -291,7 +327,7 @@ Next
 
 
 
-Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la lógica del juego, llamamos esta función en el bucle y se repite constantemente
+Function logicaJuego(cubo, luz, texturaCubo, camara, habitacion) 	; Aquí funcionará toda la lógica del juego, llamamos esta función en el bucle y se repite constantemente
 														;Le daremos como argumentos las entidades LOCALES del cubo, la luz y la cámara, y la textura del cubo
 
 	
@@ -393,9 +429,9 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 	
 		
 		;Actualizaremos el array de las balas
-		balasJugador(cantidadBalas+1,1) = posXCubo#
-		balasJugador(cantidadBalas+1,2) = posYCubo#
-		balasJugador(cantidadBalas+1,3) = posZCubo#
+		balasJugador(cantidadBalas+1,1) = EntityX(cubo)
+		balasJugador(cantidadBalas+1,2) = EntityY(cubo)
+		balasJugador(cantidadBalas+1,3) = EntityZ(cubo)
 		balasJugador(cantidadBalas+1,4) = 1
 		balasJugador(cantidadBalas+1,5) = 1
 		delayBalas = 25
@@ -521,6 +557,27 @@ Function logicaJuego(cubo, luz, texturaCubo, camara) 	; Aquí funcionará toda la 
 
 	Collisions type_bala,type_fish,3,1
 
+
+	If EntityZ(cubo) > ((datosMapa(currentMapChunk,7) + datosMapa(currentMapChunk,4)) - 30) Then
+
+		currentMapChunk = currentMapChunk + 1
+		PositionEntity habitacion,datosMapa(currentMapChunk,5),datosMapa(currentMapChunk,6),datosMapa(currentMapChunk,7)
+			
+
+
+	End If
+
+
+	If EntityZ(cubo) < ((datosMapa(currentMapChunk,7) - datosMapa(currentMapChunk,4)) + 30) Then
+
+		currentMapChunk = currentMapChunk - 1
+		PositionEntity habitacion,datosMapa(currentMapChunk,5),datosMapa(currentMapChunk,6),datosMapa(currentMapChunk,7)
+			
+
+
+	End If
+
+
 End Function
 
 
@@ -572,6 +629,7 @@ Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3, fp
 	Text resWidth#*50/100+ distancia,resHeight#*4/100+ distancia,"Cámara lateral = Tecla P"
 	Text resWidth#*50/100+ distancia,resHeight#*8/100+ distancia,"WASD para rotar el cubo"
 	Text resWidth#*50/100+ distancia,resHeight#*12/100+ distancia,"Espacio para disparar"
+	Text resWidth#*50/100+ distancia,resHeight#*16/100+ distancia,"Current map chunk: " + currentMapChunk,0,0
 	Text resWidth#*50/100+ distancia,resHeight#*20/100+ distancia,"FPS: " + fps,0,0
 	For colText=0 To 5
 		Text resWidth#*30/100+ distancia,resHeight#*(24+(4*colText))/100+ distancia,"Cols: " + colisions(colText),0,0
@@ -583,16 +641,16 @@ Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3, fp
 	Text resWidth#*4/100+ distancia,resHeight#*92/100+ distancia,"Usa las teclas + y - del teclado numérico para cambiar la velocidad.",0,0
 	Text resWidth#*4/100+ distancia,resHeight#*96/100+ distancia,"Pulsa la T para activar/desactivar este texto.",0,0
 
-	For i=1 To maxFish
-		Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia, i
-		For z=1 To 5
-			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 24*z, pescaos(i,z)
-		Next
-		For z=6 To 16
-			
-				Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 24*z, (datos2Pescados(pescaos(i,5),z-5))
-			
-		Next
+	;For i=1 To maxFish
+	;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia, i
+	;	For z=1 To 5
+	;		Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 24*z, pescaos(i,z)
+	;	Next
+	;	For z=6 To 16
+	;		
+	;			Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 24*z, (datos2Pescados(pescaos(i,5),z-5))
+	;		
+	;	Next
 		;z=6
 		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),1))
 		;z=7
@@ -609,7 +667,7 @@ Function dibujaTexto(resWidth#,resHeight#, distancia, color1, color2, color3, fp
 		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),7))
 		;z=13
 		;	Text resWidth#*50/100+ distancia + Len("Array peces:") + 80*i,resHeight#*36/100+ distancia + 32*z, (datos2Pescados(pescaos(i,5),8))
-	Next
+	;Next
 
 
 	
@@ -629,29 +687,32 @@ DisableTextureFilters()
 
 While running = 1 ; Este es el bucle del juego, está corriendo constantemente
 
-	Cls ; Limpiamos la pantalla
-	RenderWorld ; Renderizamos la escena
-	UpdateWorld ;Necesario para colisiones
-	If (MilliSecs() - fpsTimer > 1000)
-		fpsTimer = MilliSecs()
-		fps = fpsTicks
-		fpsTicks = 0
-	Else
-		fpsTicks = fpsTicks + 1
-	EndIf
+	
+	
 
-	If (MilliSecs() - logicTimer > 15)
+	If (MilliSecs() - logicTimer > 5)
+		If (MilliSecs() - fpsTimer > 1000)
+			fpsTimer = MilliSecs()
+			fps = fpsTicks
+			fpsTicks = 0
+		Else
+			fpsTicks = fpsTicks + 1
+		EndIf
+		Cls ; Limpiamos la pantalla
+		RenderWorld ; Renderizamos la escena
+		UpdateWorld ;Necesario para colisiones
 		logicTimer = MilliSecs()
-		logicaJuego(cubo, luz, texturaCubo, camara) ; Llamamos a la función de la lógica para que se ejecute
+		logicaJuego(cubo, luz, texturaCubo, camara, habitacion) ; Llamamos a la función de la lógica para que se ejecute
+		If activaTexto = 1 Then
+			dibujatexto(resWidth#,resHeight#, 0, 0, 0, 0, fps,cubo) ; Dibujamos la sombra del texto
+			dibujatexto(resWidth#,resHeight#, -2, 255,255,255, fps,cubo) ; Dibujamos el texto
+		End If
+
+		Flip ; Mandamos todo lo que se ha dibujado en memoria a la pantalla
 	EndIf
 	
 
-	If activaTexto = 1 Then
-		dibujatexto(resWidth#,resHeight#, 0, 0, 0, 0, fps,cubo) ; Dibujamos la sombra del texto
-		dibujatexto(resWidth#,resHeight#, -2, 255,255,255, fps,cubo) ; Dibujamos el texto
-	End If
-
-	Flip ; Mandamos todo lo que se ha dibujado en memoria a la pantalla
+	
 
 ; Y el bucle se repite constantemente
 
