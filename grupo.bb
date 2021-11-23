@@ -60,7 +60,7 @@ Global cantidadBalas = 0
 Global delayBalas = 0
 Global maxFish = 50
 Global activaTexto = 1
-Global maxFishData = 3
+Global maxFishData = 4
 Global currentMapChunk = 1
 
 Dim colisions#(6)
@@ -76,9 +76,11 @@ Dim datosPescados(maxFishData,2)
 datosPescados(1,1) = LoadMesh("pescao.3ds") 
 datosPescados(2,1) = LoadMesh("pescao2.3ds")
 datosPescados(3,1) = LoadMesh("tiburon.3ds") 
+datosPescados(4,1) = LoadMesh("pescao3.3ds") 
 datosPescados(1,2) = LoadTexture("pescao.png")
 datosPescados(2,2) = LoadTexture("pescao2.png")
 datosPescados(3,2) = LoadTexture("tiburon.png")
+datosPescados(4,2) = LoadTexture("pescao3.png")
 
 
 Dim datosMapa(2,7)
@@ -124,7 +126,10 @@ datos2Pescados(1,2) = -48 ;MaxX
 datos2Pescados(2,1) = -25
 datos2Pescados(2,2) = -30
 datos2Pescados(3,1) = -32
-datos2Pescados(3,2) = -48 
+datos2Pescados(3,2) = -40 
+datos2Pescados(4,1) = -25
+datos2Pescados(4,2) = -50
+
 
 
 datos2Pescados(1,3) = -0.5 	;MinY
@@ -132,7 +137,9 @@ datos2Pescados(1,4) = 8	    ;MaxY
 datos2Pescados(2,3) = -0.5 	
 datos2Pescados(2,4) = 3
 datos2Pescados(3,3) = -0.5 	
-datos2Pescados(3,4) = 8	
+datos2Pescados(3,4) = 6
+datos2Pescados(4,3) = 2 	
+datos2Pescados(4,4) = 6
 
 
 datos2Pescados(1,5) = -12 	;MinZ
@@ -140,7 +147,9 @@ datos2Pescados(1,6) = 22	    ;MaxZ
 datos2Pescados(2,5) = -12 
 datos2Pescados(2,6) = 22	
 datos2Pescados(3,5) = -12 
-datos2Pescados(3,6) = 22   
+datos2Pescados(3,6) = 22  
+datos2Pescados(4,5) = -12 
+datos2Pescados(4,6) = 22  
 
 datos2Pescados(1,7) = 0.1 	;Min speed ; Should be 0.1
 datos2Pescados(1,8) = 0.5	    ;Max speed ;Should be 0.5
@@ -148,18 +157,23 @@ datos2Pescados(2,7) = 0.25  ;Should be 0.25
 datos2Pescados(2,8) = 0.8 ;Should be 0.8
 datos2Pescados(3,7) = 0.01 	;Should be 0.01
 datos2Pescados(3,8) = 0.1	;Should be 0.1
+datos2Pescados(4,7) = 0.08 	;Should be 0.08
+datos2Pescados(4,8) = 0.3	;Should be 0.3
 
 datos2Pescados(1,9) = 8000 ;Spawn rate
 datos2Pescados(2,9) = 6000
 datos2Pescados(3,9) = 1
+datos2Pescados(4,9) = 4300
 
-datos2Pescados(1,10) = 0.25 ;Min Size
-datos2Pescados(2,10) = 0.30
+datos2Pescados(1,10) = 0.30 ;Min Size
+datos2Pescados(2,10) = 0.25
 datos2Pescados(3,10) = 2
+datos2Pescados(4,10) = 1.2
 
 datos2Pescados(1,11) = 1 ;Max Size
 datos2Pescados(2,11) = 0.5
 datos2Pescados(3,11) = 6
+datos2Pescados(4,11) = 2
 
 datos2Pescados(3,12) = 2.8 ; Hitbox X Scale
 datos2Pescados(3,13) = 1.44681370886 ; Hitbox Y Scale
@@ -172,6 +186,10 @@ datos2Pescados(1,14) = 1.09757123671
 datos2Pescados(2,12) = 1 
 datos2Pescados(2,13) = 1.05156902511
 datos2Pescados(2,14) = 1.05156902511
+
+datos2Pescados(4,12) = 1 
+datos2Pescados(4,13) = 1.05156902511
+datos2Pescados(4,14) = 1.05156902511
 
 ;datosPescados(1,1) = CreateCube()
 ;datosPescados(2,1) = CreateCube()
@@ -307,7 +325,7 @@ Function spawnFish(a,b)
 
 			pescaos(a,1) = Rnd(datos2Pescados(pescaos(a,5),1),datos2Pescados(pescaos(a,5),2))
 			pescaos(a,2) = Rnd(datos2Pescados(pescaos(a,5),3),datos2Pescados(pescaos(a,5),4))
-			pescaos(a,3) = Rnd(datos2Pescados(pescaos(a,5),5),datos2Pescados(pescaos(a,5),6))
+			pescaos(a,3) = Rnd(datos2Pescados(pescaos(a,5),5),datos2Pescados(pescaos(a,5),6)) + posZCubo#
 			pescaos(a,4) = Rnd(datos2Pescados(pescaos(a,5),7),datos2Pescados(pescaos(a,5),8))
 			While selected = 0
 					pescaos(a,5) = Rand(1,maxFishData)
@@ -578,6 +596,9 @@ Function logicaJuego(cubo, luz, texturaCubo, camara, habitacion) 	; Aquí funcion
 	End If
 
 
+	posZCubo# = EntityZ(cubo)
+
+
 End Function
 
 
@@ -690,7 +711,7 @@ While running = 1 ; Este es el bucle del juego, está corriendo constantemente
 	
 	
 
-	If (MilliSecs() - logicTimer > 5)
+	If (MilliSecs() - logicTimer > 15 )
 		If (MilliSecs() - fpsTimer > 1000)
 			fpsTimer = MilliSecs()
 			fps = fpsTicks
