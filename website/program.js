@@ -37,9 +37,12 @@ function pecesBase() {
     peces["pez2"] = Object.create(Object.prototype);
     peces["pez2"].imagen = "psc2.gif";
 	peces["pez2"].nombre = "Sweetlip Emperor"
+	peces["shark"] = Object.create(Object.prototype);
+    peces["shark"].imagen = "chark.gif";
+	peces["shark"].nombre = "Bull Shark"
 	peces["pez3"] = Object.create(Object.prototype);
-    peces["pez3"].imagen = "chark.gif";
-	peces["pez3"].nombre = "Bull Shark"
+    peces["pez3"].imagen = "pez3.gif";
+	peces["pez3"].nombre = "Rainbow Runner"
 }
 
 
